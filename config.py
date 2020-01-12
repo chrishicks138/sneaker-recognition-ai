@@ -1,12 +1,22 @@
+import os
 #Sneaker model categories
-MODELS = ["AirMax720", "AirMax95", "AirForce1", "React", "Jordan"];
+MODELS = []
+oMODELS = []
+ORIG_IMG_DIR = "./Data/Originals/"
+ARC_DIR = "./Data/Archives";
+
+for dir in os.listdir(ARC_DIR):
+#  MODELS.append(dir)
+  for d in os.listdir(ARC_DIR+'/'+dir):
+    MODELS.append(dir+'/'+d)
+    oMODELS.append(dir+'/'+d)
+
 #Data directory path
-DATA_DIR = "Data\\";
+DATA_DIR = "./Data/Downloads";
 #Dataset images directory path
-IMG_DIR = "Data\\Images"
-#Originals images directory path
-ORIG_IMG_DIR = "Data\\Originals"
+IMG_DIR = "./Data/Images/"
 #Model to save directory path
 MODEL_SAVE_PATH = "./sneaker_net.pth";
 #Test images directory path
-TEST_DIR = "Data\\Test";
+TEST_DIR = "./Data/Test";
+LIMIT = 10

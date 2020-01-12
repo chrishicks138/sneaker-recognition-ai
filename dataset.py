@@ -50,7 +50,7 @@ if __name__ == "__main__":
 	from torch.utils.tensorboard import SummaryWriter
 	writer = SummaryWriter('runs/sneaker_net_test')
 	dataset = SneakersDataset(IMG_DIR, MODELS);
-
+	print(MODELS)
 	# select random images and their target indices
 	images, labels = select_n_random(dataset)
 
