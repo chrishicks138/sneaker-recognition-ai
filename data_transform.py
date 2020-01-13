@@ -81,7 +81,7 @@ def images_to_array(img_dir_path, labels):
     total = len(os.listdir(path))
 #    print('Total samples found: '+str(total))
     if total == 0:
-      os.remove(os.join.path(path, model+'.tar.bz2'))
+      os.remove(os.path.join(path, model+'.tar.bz2'))
 
 #      print('Archive removed')
 #    progress = ProgressBar(total=total, decimals=3, length=50, fill='\u2588', zfill='-');
