@@ -11,6 +11,7 @@ from PIL import Image
 from PIL import ImageFilter
 from PIL import ImageEnhance
 from trainer import *
+from progress import *
 
 class HiddenPrints:
   def __enter__(self):
@@ -25,11 +26,12 @@ class HiddenPrints:
 class Samples:
   def __init__(self):
     super().__init__()
-
+  '''
   def progress(self):
     progress = ProgressBar(total=self.bt, suffix=self.status, prefix=str(self.m)+'/'+str(self.bt), decimals=2, length=50, fill='\u2588', zfill='_')
     progress.print_progress_bar(self.m - 0 * 100  + 1)
     return
+    '''
 
   def convert(self, model_dir):
     c = 0
@@ -52,13 +54,17 @@ class Samples:
               if "BW" in mode:
                 im = im.convert('L')
               im.save(image_path)
-              self.status = 'Converting '+str(c)+' files'
-              samples.progress()
+              self.prestatus = 'Converting'
+              self.status = str(c)+' files'
+              self.log_batch_index = c
+              self.log_batch_size = len(os.listdir(model_dir))
+              Status().status(self.bt, self.status, self.prestatus, self.m, self.log_batch_index, self.log_batch_size)
         except:
 #          raise
 #          print(file+' CORRUPTED, REMOVING')
-          self.status = "REMOVING CORRUPTED FILE"
-          samples.progress()
+          self.prestatus = "REMOVING"
+          self.status = "CORRUPTED FILE"
+          Status().status(self.bt, self.status, self.prestatus, self.m)
           os.remove(model_dir+'/'+file)
           continue
         try:
@@ -83,19 +89,22 @@ class Samples:
     arcdir = os.path.join(ARC_DIR, self.sneaker_brand)
     if not os.path.exists(arcdir):
       os.makedirs(arcdir)
-    with tarfile.open(arcdir+'/'+self.sneaker_model+'.tar.bz2', "w:bz2") as tar:
+    tfile = arcdir+'/'+self.sneaker_model+'.tar.bz2'
+    with tarfile.open(tfile, "w:bz2") as tar:
       c = 0
       for f in files:
         c = 1+c
-        self.status = 'Archiving '+str(c)+' files'
-        samples.progress()
+        self.prestatus = 'Archiving'
+        self.status = str(c)+' files'
+        self.log_batch_index = c
+        self.log_batch_size = len(files)
+        Status().status(self.bt, self.status, self.prestatus, self.m, self.log_batch_index, self.log_batch_size)
         image = os.path.basename(f)
         tar.add(f, arcname=image)
         os.remove(f)
-#    for tarinfo in tar:
-#      print(tarinfo.size)
       tar.close()
 #    print(str(c)+' FILES ARCHIVED\n')
+    Trainer().run(tfile)
     try:
       for f in os.listdir(model_dir):
         os.remove(model_dir+'/'+f)
@@ -104,14 +113,14 @@ class Samples:
     except:
 #    print('\r'+model_dir+' NOT FOUND!')
       return
-    self.status = 'TRAINING'
-    samples.progress()
-    Trainer().run()
 
 
   def download(self, sneaker_brand, sneaker_model):
-    self.status = 'Downloading '+str(LIMIT)+' files'
-    samples.progress()
+    self.prestatus = 'Downloading'
+    self.status = str(LIMIT)+' files'
+    self.log_batch_index = self.m
+    self.log_batch_size = self.bt
+    Status().status(self.bt, self.status, self.prestatus, self.m, self.log_batch_index, self.log_batch_size)
     search = sneaker_brand+' '+sneaker_model
     self.sneaker_brand = sneaker_brand
     self.sneaker_model = sneaker_model
@@ -124,27 +133,36 @@ class Samples:
     samples.convert(model_dir)
 
   def download_images(self):
-    self.status = 'Searching'
+    sneaks = []
+    print('\n')
+    self.prestatus = 'Searching'
     self.m = 0
-    for filename in os.listdir(DATA_DIR):
-      self.bt = len(os.listdir(DATA_DIR))
-      if filename.endswith(".txt"):
-        sneaker_model_names = os.path.splitext(filename)[0].split('_');
-        sneaker_brand = sneaker_model_names[0];
-        sneaker_model = sneaker_model_names[1];
-        model_dir = os.path.join(ORIG_IMG_DIR, sneaker_brand, sneaker_model);
-        self.m = 1+self.m
-        samples.progress()
-        if not os.path.exists(model_dir):
-          os.makedirs(model_dir);
-          arcdir = os.path.join(ARC_DIR, sneaker_brand)
-          if not os.path.exists(arcdir):
-            os.makedirs(arcdir)
-          if (sneaker_model+'.tar.bz2') in os.listdir(arcdir):
-#          print('Archive found! Skipping...')
-            pass
-          else:
-            samples.download(sneaker_brand, sneaker_model)
+    with open(DATA_DIR+'/shoes.txt', 'r') as shoes:
+      for shoe in shoes:
+        sneaks.append(shoe)
+    for shoe in sneaks:
+      self.bt = len(sneaks)
+      sneaker_model_names = shoe.split('_')
+      sneaker_brand = sneaker_model_names[0];
+      sneaker_model = sneaker_model_names[1];
+      sneaker_model = sneaker_model.replace('\n','')
+      model_dir = os.path.join(ORIG_IMG_DIR, sneaker_brand, sneaker_model);
+      self.m = 1+self.m
+      self.status = str(self.m)+'/'+str(self.bt)
+      self.log_batch_index = self.m
+      self.log_batch_size = self.bt
+      Status().status(self.bt, self.status, self.prestatus, self.m, self.log_batch_index, self.log_batch_size)
+      if not os.path.exists(model_dir):
+        os.makedirs(model_dir);
+      arcdir = os.path.join(ARC_DIR, sneaker_brand)
+      if not os.path.exists(arcdir):
+        os.makedirs(arcdir)
+        if (sneaker_model+'.tar.bz2') in os.listdir(arcdir):
+          print('Archive found! Skipping...')
+          continue
+        else:
+          samples.download(sneaker_brand, sneaker_model)
+      continue
 
 samples = Samples()
 samples.download_images()

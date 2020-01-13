@@ -1,15 +1,12 @@
 import os
 #Sneaker model categories
 MODELS = []
-oMODELS = []
 ORIG_IMG_DIR = "./Data/Originals/"
-ARC_DIR = "./Data/Archives";
+ARC_DIR = "./Data/Archives"
 
 for dir in os.listdir(ARC_DIR):
-#  MODELS.append(dir)
   for d in os.listdir(ARC_DIR+'/'+dir):
     MODELS.append(dir+'/'+d)
-    oMODELS.append(dir+'/'+d)
 
 #Data directory path
 DATA_DIR = "./Data/Downloads";
