@@ -36,14 +36,14 @@ def resize_multiple_images(src_path, dst_path):
             os.makedirs(model_to_dir);
           try:
             total = len(os.listdir(model_from_dir))
-            print('Total samples found: '+str(total))
+#            print('Total samples found: '+str(total))
             if total == 0:
               os.rmdir(path)
           except:
             return
-          progress = ProgressBar(total=total, prefix=model, suffix='Done', decimals=3, length=50, fill='\u2588', zfill='-');
+#          progress = ProgressBar(total=total, prefix=model, suffix='Done', decimals=3, length=50, fill='\u2588', zfill='-');
           for i, filename in enumerate(os.listdir(model_from_dir)):
-            progress.print_progress_bar(i);
+#            progress.print_progress_bar(i);
             try:
               img = Image.open(os.path.join(src_path, brand, model, filename));
               new_img = img.resize((128, 128));
@@ -79,13 +79,13 @@ def images_to_array(img_dir_path, labels):
     path = os.path.join(img_dir_path, model);
     model_index = labels.index(model);
     total = len(os.listdir(path))
-    print('Total samples found: '+str(total))
+#    print('Total samples found: '+str(total))
     if total == 0:
       os.remove(os.path.join(ARC_DIR, model+'.tar.gz'))
-      print('Archive removed')
-    progress = ProgressBar(total=total, decimals=3, length=50, fill='\u2588', zfill='-');
+#      print('Archive removed')
+#    progress = ProgressBar(total=total, decimals=3, length=50, fill='\u2588', zfill='-');
     for i, img_name in enumerate(os.listdir(path)):
-      progress.print_progress_bar(i + 1);
+#      progress.print_progress_bar(i + 1);
       if 'tar.gz' not in img_name:
         try:
           img = Image.open(os.path.join(path, img_name));

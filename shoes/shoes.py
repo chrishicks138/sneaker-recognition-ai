@@ -23,7 +23,7 @@ for shoe in shoes:
       brand = brand.replace(' ','-')
       fname = brand+'_'+fname
       if ',Shoes,' in row['categories']:
-        bchars = ["'","(",")","&",",","1/2","/","!"]
+        bchars = ["'","(",")","&",",","1/2","/","!","."]
         for char in bchars:
           fname = fname.replace(char,"")
         urls = url.split(',')

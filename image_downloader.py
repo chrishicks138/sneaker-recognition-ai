@@ -10,7 +10,7 @@ from google_images_download import google_images_download as gid
 from PIL import Image
 from PIL import ImageFilter
 from PIL import ImageEnhance
-
+from trainer import *
 
 class HiddenPrints:
   def __enter__(self):
@@ -104,6 +104,10 @@ class Samples:
     except:
 #    print('\r'+model_dir+' NOT FOUND!')
       return
+    self.status = 'TRAINING'
+    samples.progress()
+    Trainer().run()
+
 
   def download(self, sneaker_brand, sneaker_model):
     self.status = 'Downloading '+str(LIMIT)+' files'

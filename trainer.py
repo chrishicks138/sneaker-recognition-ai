@@ -38,10 +38,10 @@ class Trainer:
 
       log_batch_size = 100;
       log_batch_index = 0;
-      progress = ProgressBar(total=log_batch_size, prefix='Training', suffix='Now', decimals=3, length=50, fill='\u2588', zfill='-')
+#      progress = ProgressBar(total=log_batch_size, prefix='Training', suffix='Now', decimals=3, length=50, fill='\u2588', zfill='-')
 
       for i, data in train_list:
-        progress.print_progress_bar(i - log_batch_index * log_batch_size + 1);
+#        progress.print_progress_bar(i - log_batch_index * log_batch_size + 1);
         inputs, labels = data;
         if use_gpu:
           inputs = inputs.cuda();
@@ -64,7 +64,7 @@ class Trainer:
 
         if i % log_batch_size == log_batch_size - 1:
           processed_count = self.batch_size * log_batch_size;
-          print('[%d, %5d] loss: %.3f correct: %5d' %(epoch + 1, i + 1, running_loss / log_batch_size, running_correct))
+ #         print('[%d, %5d] loss: %.3f correct: %5d' %(epoch + 1, i + 1, running_loss / log_batch_size, running_correct))
           self.tensorboard.add_scalar("Loss", running_loss, sub_epoch);
           self.tensorboard.add_scalar("Correct", running_correct, sub_epoch);
           self.tensorboard.add_scalar("Accuracy", running_correct / processed_count, sub_epoch);
@@ -85,53 +85,47 @@ class Trainer:
   def __get_correct_total(self, preds, labels):
     return preds.argmax(dim=1).eq(labels).sum().item()
 
-def rmimg():
-  for file in os.listdir(mpath[0]):
-    if '.jpg' in file:
-      os.remove(os.path.join(epath, file))
+  def rmimg(self):
+    for file in os.listdir(mpath[0]):
+      if '.jpg' in file:
+        os.remove(os.path.join(epath, file))
 #    print('\r\nREMOVED '+epath+'\r\n')
 
-def model_pick():
-  global mpath
-  MODELS = random.choices(oMODELS, k = 1)
-  for model in MODELS:
-    print('\nOPENING ARCHIVE: '+model)
+  def model_pick(self):
+    model = random.choice(oMODELS)
+#    print('\nOPENING ARCHIVE: '+model)
     smodel = model.split('/')[0]
     apath = os.path.join(ARC_DIR, model)
-    global epath
     epath = os.path.join(IMG_DIR, smodel)
     mpath = epath.split('/')
     bpath = mpath[3]
     rmodel = model.split('.')[0]
     ipath = epath+'/'+rmodel.split('/')[1]
-  if not os.path.exists(ipath):
-    os.makedirs(ipath)
-  try:
-    with tarfile.open(apath) as tar:
-      tar.extractall(ipath)
-  except:
-    return
+    if not os.path.exists(ipath):
+      os.makedirs(ipath)
+    try:
+      with tarfile.open(apath) as tar:
+        tar.extractall(ipath)
+    except:
+      return
+    global MODEL
+    MODEL = []
+    MODEL.append(rmodel)
 
-  global MODEL
-  MODEL = []
-  MODEL.append(rmodel)
-
-
-while True:
-  model_pick()
-  trainer = Trainer();
-  net = Net();
-  resnet = resnet101(3, len(MODEL));
-  try:
-    train_set = SneakersDataset(IMG_DIR, MODEL);
-    trainer.plug_net(net);
-    trainer.plug_data_set(train_set);
-    trainer.load_model(MODEL_SAVE_PATH);
-  except:
-    print('Training failed!')
-    continue
+  def run(self):
+    trainer = Trainer()
+    trainer.model_pick()
+    net = Net();
+    resnet = resnet101(3, len(MODEL));
+    try:
+      train_set = SneakersDataset(IMG_DIR, MODEL);
+      trainer.plug_net(net);
+      trainer.plug_data_set(train_set);
+      trainer.load_model(MODEL_SAVE_PATH);
+    except:
+      print('Training failed!')
 
 #  print("\nInit training :\n")
-  trainer.train(20, use_gpu=False);
-  trainer.save_model(MODEL_SAVE_PATH);
-  rmimg()
+    trainer.train(20, use_gpu=False);
+    trainer.save_model(MODEL_SAVE_PATH);
+    trainer.rmimg()
