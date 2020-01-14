@@ -78,9 +78,9 @@ def images_to_array(img_dir_path, labels):
       img_tensor = preprocess(img);
       # service.img_show(img_tensor);
       # img_tensor = np.array(img); #cv2.imread(os.path.join(path, img_name), cv2.IMREAD_GRAYSCALE);
-          if img_tensor is None:
-            continue;
-          dataset.append((img_tensor, model_index));
+      if img_tensor is None:
+        continue;
+      dataset.append((img_tensor, model_index));
   random.shuffle(dataset);
 
   return dataset;
