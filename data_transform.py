@@ -34,13 +34,6 @@ def resize_multiple_images(src_path, dst_path):
           model_to_dir = os.path.join(dst_path, brand, model);
           if not os.path.exists(model_to_dir):
             os.makedirs(model_to_dir);
-          try:
-            total = len(os.listdir(model_from_dir))
-#            print('Total samples found: '+str(total))
-            if total == 0:
-              os.rmdir(path)
-          except:
-            return
 #          progress = ProgressBar(total=total, prefix=model, suffix='Done', decimals=3, length=50, fill='\u2588', zfill='-');
           for i, filename in enumerate(os.listdir(model_from_dir)):
 #            progress.print_progress_bar(i);
@@ -51,7 +44,6 @@ def resize_multiple_images(src_path, dst_path):
                 os.makedirs(model_to_dir)
               new_img.save(os.path.join(model_to_dir, filename));
 
-              print(path, filename)
             except UnidentifiedImageError:
               os.remove(os.path.join(path, img_name));
               continue
@@ -78,29 +70,17 @@ def images_to_array(img_dir_path, labels):
   for model in labels:
     path = os.path.join(img_dir_path, model);
     model_index = labels.index(model);
-    total = len(os.listdir(path))
-#    print('Total samples found: '+str(total))
-    if total == 0:
-      os.remove(os.path.join(ARC_DIR, model+'.tar.bz2'))
-      continue
-#      print('Archive removed')
 #    progress = ProgressBar(total=total, decimals=3, length=50, fill='\u2588', zfill='-');
     for i, img_name in enumerate(os.listdir(path)):
 #      progress.print_progress_bar(i + 1);
-      if 'tar.gz' not in img_name:
-        try:
-          img = Image.open(os.path.join(path, img_name));
-          img = img.convert('RGB');
-          img_tensor = preprocess(img);
+      img = Image.open(os.path.join(path, img_name));
+      img = img.convert('RGB');
+      img_tensor = preprocess(img);
       # service.img_show(img_tensor);
       # img_tensor = np.array(img); #cv2.imread(os.path.join(path, img_name), cv2.IMREAD_GRAYSCALE);
           if img_tensor is None:
             continue;
           dataset.append((img_tensor, model_index));
-        except:
-          os.remove(path+'/'+img_name)
-
-#    os.rmdir(path)
   random.shuffle(dataset);
 
   return dataset;
