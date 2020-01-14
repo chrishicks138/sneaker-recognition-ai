@@ -26,12 +26,6 @@ class HiddenPrints:
 class Samples:
   def __init__(self):
     super().__init__()
-  '''
-  def progress(self):
-    progress = ProgressBar(total=self.bt, suffix=self.status, prefix=str(self.m)+'/'+str(self.bt), decimals=2, length=50, fill='\u2588', zfill='_')
-    progress.print_progress_bar(self.m - 0 * 100  + 1)
-    return
-    '''
 
   def convert(self, model_dir):
     c = 0
@@ -58,13 +52,16 @@ class Samples:
               self.status = str(c)+' files'
               self.log_batch_index = c
               self.log_batch_size = len(os.listdir(model_dir))
-              Status().status(self.bt, self.status, self.prestatus, self.m, self.log_batch_index, self.log_batch_size)
+              Status().status(self.bt, self.prestatus, self.status, self.m, self.log_batch_index, self.log_batch_size)
         except:
 #          raise
 #          print(file+' CORRUPTED, REMOVING')
           self.prestatus = "REMOVING"
           self.status = "CORRUPTED FILE"
-          Status().status(self.bt, self.status, self.prestatus, self.m)
+          self.log_batch_index = c
+          self.log_batch_size = len(os.listdir(model_dir))
+          Status().status(self.bt, self.prestatus, self.status, self.m, self.log_batch_index, self.log_batch_size)
+          Status().status(self.bt, self.prestatus, self.status, self.m)
           os.remove(model_dir+'/'+file)
           continue
         try:
@@ -98,7 +95,7 @@ class Samples:
         self.status = str(c)+' files'
         self.log_batch_index = c
         self.log_batch_size = len(files)
-        Status().status(self.bt, self.status, self.prestatus, self.m, self.log_batch_index, self.log_batch_size)
+        Status().status(self.bt, self.prestatus, self.status, self.m, self.log_batch_index, self.log_batch_size)
         image = os.path.basename(f)
         tar.add(f, arcname=image)
         os.remove(f)
@@ -120,7 +117,7 @@ class Samples:
     self.status = str(LIMIT)+' files'
     self.log_batch_index = self.m
     self.log_batch_size = self.bt
-    Status().status(self.bt, self.status, self.prestatus, self.m, self.log_batch_index, self.log_batch_size)
+    Status().status(self.bt, self.prestatus, self.status, self.m, self.log_batch_index, self.log_batch_size)
     search = sneaker_brand+' '+sneaker_model
     self.sneaker_brand = sneaker_brand
     self.sneaker_model = sneaker_model
@@ -137,9 +134,12 @@ class Samples:
     print('\n')
     self.prestatus = 'Searching'
     self.m = 0
+    antiTraversal = ['../', 'cat ../', ]
     with open(DATA_DIR+'/shoes.txt', 'r') as shoes:
       for shoe in shoes:
-        sneaks.append(shoe)
+        for traversal in antiTraversal:
+          if traversal not in shoe:
+            sneaks.append(shoe)
     for shoe in sneaks:
       self.bt = len(sneaks)
       sneaker_model_names = shoe.split('_')
@@ -151,7 +151,7 @@ class Samples:
       self.status = str(self.m)+'/'+str(self.bt)
       self.log_batch_index = self.m
       self.log_batch_size = self.bt
-      Status().status(self.bt, self.status, self.prestatus, self.m, self.log_batch_index, self.log_batch_size)
+      Status().status(self.bt, self.prestatus, self.status, self.m, self.log_batch_index, self.log_batch_size)
       if not os.path.exists(model_dir):
         os.makedirs(model_dir);
       arcdir = os.path.join(ARC_DIR, sneaker_brand)
