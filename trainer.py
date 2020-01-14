@@ -45,10 +45,9 @@ class Trainer:
 #      progress = ProgressBar(total=log_batch_size, prefix='Training', suffix='Now', decimals=3, length=50, fill='\u2588', zfill='-')
       for i, data in train_list:
         self.m = i
-        self.prestatus = 'Training '+str(i)
-        self.status = str(epoch)
-        self.bt = log_batch_size * self.batch_size
-
+        self.prestatus = 'Training'
+        self.status = 'Pass '+str(epoch)+'/'+str(PASS)
+        self.bt = len(self.data_set) / self.batch_size
         Status().status(self.bt, self.prestatus, self.status, self.m, log_batch_index, log_batch_size)
 
 #        progress.print_progress_bar(i - log_batch_index * log_batch_size + 1);
@@ -111,14 +110,16 @@ class Trainer:
       with tarfile.open(tfile) as tar:
         tar.extractall(self.ipath)
     except:
-      print('EXTRACTION FAILED')
+      print('\nEXTRACTION FAILED AT '+self.ipath)
       return
+#    print(os.listdir(self.ipath))
     self.MODEL.append(brand+'/'+model)
+#    print(self.MODEL)
     return self.MODEL
 
   def run(self, tfile):
     trainer = Trainer()
-    trainer.model_pick(tfile,MODELS)
+    trainer.model_pick(tfile, MODELS)
 #  print("\nInit training :\n")
     net = Net();
     resnet = resnet101(3, len(self.MODEL));
@@ -127,10 +128,11 @@ class Trainer:
       trainer.plug_net(net);
       trainer.plug_data_set(train_set);
       trainer.load_model(MODEL_SAVE_PATH);
+      trainer.train(PASS, use_gpu=False);
+      trainer.save_model(MODEL_SAVE_PATH);
     except:
-      print('Training failed!')
+      print('Training failed at '+tfile)
+      trainer.rmimg()
       raise
       return
-    trainer.train(20, use_gpu=False);
-    trainer.save_model(MODEL_SAVE_PATH);
     trainer.rmimg()
