@@ -42,7 +42,7 @@ class Convert:
               self.log_batch_size = len(os.listdir(model_dir))
               Status().status(self.bt, self.prestatus, self.status, self.m, self.log_batch_index, self.log_batch_size)
         except:
-#          raise
+          raise
 #          print(file+' CORRUPTED, REMOVING')
           self.prestatus = "REMOVING"
           self.status = "CORRUPTED FILE"
