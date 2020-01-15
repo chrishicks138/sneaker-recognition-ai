@@ -99,7 +99,7 @@ class Trainer:
 
   def run(self, tfile, sneaker_brand, sneaker_model):
     trainer = Trainer()
-    Path().ipath(tfile)
+    ExtractDir().ipath(tfile)
     self.MODEL.append(sneaker_brand+'/'+sneaker_model)
 #  print("\nInit training :\n")
     net = Net();

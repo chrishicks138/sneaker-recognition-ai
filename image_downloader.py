@@ -8,7 +8,6 @@ from tempfile import mkstemp
 from archive import *
 from convert import *
 
-
 class HiddenPrints:
   def __init__(self):
     self.data = []
@@ -24,15 +23,27 @@ class HiddenPrints:
     sys.stdout = sys.__stdout__
 
 class Samples:
-  def __init__(self):
+  def __init__(self, sneaker_brand, sneaker_model):
     super().__init__()
+    self.sneaker_brand = sneaker_brand
+    self.sneaker_model = sneaker_model
+    self.mdir = ModelDir(sneaker_brand, sneaker_model)
+    try:
+      ArcDir().arc_dir(self.sneaker_brand, self.sneaker_model)
+      if ArcDir().lsarc(self.sneaker_model, self.sneaker_brand) is False:
+        self.download()
+      else:
+        return
+    except:
+      raise
 
-  def download(self, sneaker_brand, sneaker_model):
+
+  def download(self):
     self.prestatus = 'Downloading'
-    search = sneaker_brand+' '+sneaker_model
+    search = self.sneaker_brand+' '+self.sneaker_model
     s = search.replace(' ','/')
     print('\n'+search)
-    model_dir = Path().model_dir(sneaker_brand, sneaker_model)
+    model_dir = self.mdir.model_dir()
     resp = gid.googleimagesdownload()
     with HiddenPrints() as x:
       aip, data = resp.download({"keywords":search,"format":"jpg","limit":LIMIT,"aspect_ratio":"square","output_directory":model_dir,"no_directory":"1"})
@@ -45,32 +56,5 @@ class Samples:
         self.m = self.m+1
         self.status = str(self.m)
         Status().status(self.bt, self.prestatus, self.status, self.m, self.log_batch_index, self.log_batch_size)
-    Convert().convert(model_dir, sneaker_brand, sneaker_model)
+    Convert(self.sneaker_brand, self.sneaker_model).convert()
 
-  def download_images(self, sneakers):
-    shoes = []
-    self.prestatus = 'Searching'
-    self.m = 0
-    antiTraversal = ['../', 'cat ../', 'cat ', ]
-    for shoe in sneakers:
-      for traversal in antiTraversal:
-        if traversal not in shoe:
-          shoes.append(shoe)
-    for shoe in set(shoes):
-      self.bt = len(shoes)
-      sneaker_model_names = shoe.split('_')
-      sneaker_brand = sneaker_model_names[0];
-      sneaker_model = sneaker_model_names[1];
-      self.m = 1+self.m
-      self.status = str(self.m)+'/'+str(self.bt)
-      self.log_batch_index = self.m
-      self.log_batch_size = self.bt
-      Status().status(self.bt, self.prestatus, self.status, self.m, self.log_batch_index, self.log_batch_size)
-      Path().model_dir(sneaker_brand, sneaker_model)
-      Path().arc_dir(sneaker_brand, sneaker_model)
-      if Path().lsarc(sneaker_model, sneaker_brand) is True:
-        samples.download(sneaker_brand, sneaker_model)
-      else:
-        continue
-
-samples = Samples()
