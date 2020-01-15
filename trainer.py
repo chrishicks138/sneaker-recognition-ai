@@ -7,7 +7,8 @@ from model import *
 from resnet import *
 import tarfile
 from progress import *
-
+from cleanup import *
+from paths import *
 
 class Trainer:
   tensorboard = SummaryWriter('runs/sneaker_net');
@@ -94,32 +95,12 @@ class Trainer:
   def __get_correct_total(self, preds, labels):
     return preds.argmax(dim=1).eq(labels).sum().item()
 
-  def rmimg(self):
-    for file in os.listdir(self.ipath):
-      if '.jpg' in file:
-        os.remove(os.path.join(self.ipath, file))
 
-  def model_pick(self, tfile, MODELS):
-    amodel = tfile.split('/')[4]
-    model = amodel.split('.')[0]
-    brand = tfile.split('/')[3]
-    self.ipath = os.path.join(IMG_DIR, brand, model)
-    if not os.path.exists(self.ipath):
-      os.makedirs(self.ipath)
-    try:
-      with tarfile.open(tfile) as tar:
-        tar.extractall(self.ipath)
-    except:
-      print('\nEXTRACTION FAILED AT '+self.ipath)
-      return
-#    print(os.listdir(self.ipath))
-    self.MODEL.append(brand+'/'+model)
-#    print(self.MODEL)
-    return self.MODEL
 
-  def run(self, tfile):
+  def run(self, tfile, sneaker_brand, sneaker_model):
     trainer = Trainer()
-    trainer.model_pick(tfile, MODELS)
+    Path().ipath(tfile)
+    self.MODEL.append(sneaker_brand+'/'+sneaker_model)
 #  print("\nInit training :\n")
     net = Net();
     resnet = resnet101(3, len(self.MODEL));
@@ -132,7 +113,5 @@ class Trainer:
       trainer.save_model(MODEL_SAVE_PATH);
     except:
       print('Training failed at '+tfile)
-      trainer.rmimg()
       raise
       return
-    trainer.rmimg()

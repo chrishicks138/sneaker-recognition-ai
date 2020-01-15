@@ -43,7 +43,7 @@ class Archive:
         os.remove(f)
       tar.close()
 #    print(str(c)+' FILES ARCHIVED\n')
-    Trainer().run(tfile)
+    Trainer().run(tfile, sneaker_brand, sneaker_model)
     try:
       for f in os.listdir(model_dir):
         os.remove(model_dir+'/'+f)
