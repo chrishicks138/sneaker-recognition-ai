@@ -35,11 +35,8 @@ class Samples:
       Convert(self.sneaker_brand, self.sneaker_model).convert()
 
   def check(self):
-    try:
-      if self.arcDir.lsarc() is False:
-        self.download()
-      else:
-        print('Archive found')
-    except:
-      raise
+    if self.arcDir.lsarc() is False:
+      self.download()
+    else:
+      print('Archive found')
 

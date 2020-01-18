@@ -24,7 +24,7 @@ class Archive:
 
   def archive(self, files):
     archive_file = self.ArcDir.archive_file()
-    with tarfile.open(archive_file, "w|gz") as tar:
+    with tarfile.open(archive_file, "w:gz") as tar:
       for file in files:
         image = self.mdir.basename(file)
         tar.add(file, arcname=image)

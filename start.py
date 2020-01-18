@@ -1,6 +1,7 @@
 from flask import Flask
 from shoes import *
 from status import *
+from trainer import Trainer
 
 app  = Flask(__name__)
 lock = threading.Lock()
@@ -11,7 +12,7 @@ def hello():
 
 @app.route('/start')
 def start():
-  Parser().parse()
+  Search().search()
 
 @app.route('/stats/processed')
 def processed():
@@ -24,5 +25,9 @@ def total():
 @app.route('/stats/archive_total')
 def archive_total():
   return Stats().archive_total()
+
+@app.route('/train')
+def train():
+  Trainer().run()
 
 app.run(debug=True)

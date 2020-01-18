@@ -1398,3 +1398,13 @@ __pycache__/
 runs/
 
 *.png
+
+./Data/Archives
+
+./Data/Originals
+
+./Data/Downloads
+
+*.tar.gz
+
+./local

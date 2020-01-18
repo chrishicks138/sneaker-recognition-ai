@@ -93,37 +93,38 @@ class Trainer:
   def __get_correct_total(self, preds, labels):
     return preds.argmax(dim=1).eq(labels).sum().item()
 
-  def run(self, shoe):
-    sneaker_model_names = shoe.split('_')
-    sneaker_brand = sneaker_model_names[0]
-    sneaker_model = sneaker_model_names[1]
-    self.MODEL = []
-    trainer = Trainer()
-    extract = ExtractDir(sneaker_brand, sneaker_model)
-    arcDir = ArcDir(sneaker_brand, sneaker_model)
-    ipath = extract.tpath()
-    try:
-      with tarfile.open(extract.archive()) as tar:
-        tar.extractall(ipath)
-      if extract.__ls__() == 0:
-        print(ipath+' is empty!')
-        arcDir.__rm__()
-
-    except:
-      raise
-    self.MODEL.append(sneaker_brand+'/'+sneaker_model)
-    net = Net();
-    resnet = resnet101(3, len(self.MODEL));
-    try:
-      train_set = SneakersDataset(IMG_DIR, self.MODEL)
-      trainer.plug_net(net);
-      trainer.plug_data_set(train_set);
-      trainer.load_model(MODEL_SAVE_PATH);
-      trainer.train(PASS, use_gpu=False);
-      trainer.save_model(MODEL_SAVE_PATH);
-    except:
-      print('Training failed!')
-      extract.__rm__()
+  def run(self):
+    for shoe in ARCHIVES:
+      shoe = shoe.split('.tar.gz')[0]
+      sneaker_model_names = shoe.split('_')
+      sneaker_brand = sneaker_model_names[0]
+      sneaker_model = sneaker_model_names[1]
+      self.MODEL = []
+      trainer = Trainer()
+      extract = ExtractDir(sneaker_brand, sneaker_model)
+      arcDir = ArcDir(sneaker_brand, sneaker_model)
+      ipath = extract.tpath()
+      try:
+        with tarfile.open(extract.archive()) as tar:
+          tar.extractall(ipath)
+        if extract.__ls__() == 0:
+          print(ipath+' is empty!')
+          arcDir.__rm__()
+      except:
+        raise
+      self.MODEL.append(sneaker_brand+'/'+sneaker_model)
+      net = Net();
+      resnet = resnet101(3, len(self.MODEL));
+      try:
+        train_set = SneakersDataset(IMG_DIR, self.MODEL)
+        trainer.plug_net(net);
+        trainer.plug_data_set(train_set);
+        trainer.load_model(MODEL_SAVE_PATH);
+        trainer.train(PASS, use_gpu=False);
+        trainer.save_model(MODEL_SAVE_PATH);
+      except:
+        print('Training failed!')
+        extract.__rm__()
+        extract.__rmdir__()
+        raise
       extract.__rmdir__()
-      raise
-    extract.__rmdir__()

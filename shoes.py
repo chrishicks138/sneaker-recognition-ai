@@ -5,10 +5,8 @@ from image_downloader import Samples
 from paths import *
 from db import *
 
-files = ['./wshoes.csv','./mshoes.csv']
-badnames = ['shirts', 'Usb']
+file = './shoes.txt'
 sneakers = []
-shoes = []
 
 lock = threading.Lock()
 
@@ -22,37 +20,14 @@ class Pick:
   def run(self):
     Thread().run(self.sneakers)
 
-class Parser:
+class Search:
   def __init__(self):
-    self.parse()
+    self.search()
     print('running')
-  def parse(self):
-    for file in files:
-      with open(file) as w:
-        cw = csv.DictReader(w, delimiter=",", quotechar='"')
-        i = 0
-        for row in cw:
-          brand = row["brand"]
-          name = row["name"]
-          bn = len(brand.split())
-          name = name.split()
-          if bn == 0:
-            brand = name[0]
-          if len(name) != len(brand):
-            pass
-          else:
-            name.pop(bn-1)
-          fname = '-'.join(name[:6])
-          brand = brand.replace(' ','-')
-          fname = brand+'_'+fname
-          if ',Shoes,' in row['categories']:
-            bchars = ["'","(",")","&",",","1/2","/","!","."]
-            for char in bchars:
-              fname = fname.replace(char,"")
-            for name in badnames:
-              if name not in fname:
-                sneakers.append(fname)
-
+  def search(self):
+    with open(file) as shoes:
+      for shoe in shoes:
+        sneakers.append(shoe)
     Pick(sneakers).run()
 
 class Thread:
