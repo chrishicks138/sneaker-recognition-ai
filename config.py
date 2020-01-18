@@ -1,14 +1,10 @@
-import os
 
 #Sneaker model categories
 MODELS = []
+#Original Images directory path
 ORIG_IMG_DIR = "./Data/Originals/"
+#Archive directory path
 ARC_DIR = "./Data/Archives"
-
-for dir in os.listdir(ARC_DIR):
-  for d in os.listdir(ARC_DIR+'/'+dir):
-    MODELS.append(dir+'/'+d)
-
 #Data directory path
 DATA_DIR = "./Data/Downloads";
 #Dataset images directory path
@@ -21,3 +17,7 @@ TEST_DIR = "./Data/Test";
 LIMIT = 10
 #Training passes
 PASS = 20
+#Image format
+IMAGE_FORMAT = 'jpg'
+#Archive format
+ARCHIVE_FORMAT = '.tar.gz'

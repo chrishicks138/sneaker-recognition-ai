@@ -1,13 +1,11 @@
 from torch.utils.tensorboard import SummaryWriter
 
-import random
 from config import *
 from dataset import *
 from model import *
 from resnet import *
 import tarfile
 from progress import *
-from cleanup import *
 from paths import *
 
 class Trainer:
@@ -95,13 +93,25 @@ class Trainer:
   def __get_correct_total(self, preds, labels):
     return preds.argmax(dim=1).eq(labels).sum().item()
 
-
-
-  def run(self, tfile, sneaker_brand, sneaker_model):
+  def run(self, shoe):
+    sneaker_model_names = shoe.split('_')
+    sneaker_brand = sneaker_model_names[0]
+    sneaker_model = sneaker_model_names[1]
+    self.MODEL = []
     trainer = Trainer()
-    ExtractDir().ipath(tfile)
+    extract = ExtractDir(sneaker_brand, sneaker_model)
+    arcDir = ArcDir(sneaker_brand, sneaker_model)
+    ipath = extract.tpath()
+    try:
+      with tarfile.open(extract.archive()) as tar:
+        tar.extractall(ipath)
+      if extract.__ls__() == 0:
+        print(ipath+' is empty!')
+        arcDir.__rm__()
+
+    except:
+      raise
     self.MODEL.append(sneaker_brand+'/'+sneaker_model)
-#  print("\nInit training :\n")
     net = Net();
     resnet = resnet101(3, len(self.MODEL));
     try:
@@ -112,6 +122,8 @@ class Trainer:
       trainer.train(PASS, use_gpu=False);
       trainer.save_model(MODEL_SAVE_PATH);
     except:
-      print('Training failed at '+tfile)
+      print('Training failed!')
+      extract.__rm__()
+      extract.__rmdir__()
       raise
-      return
+    extract.__rmdir__()

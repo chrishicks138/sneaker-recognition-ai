@@ -1,21 +1,33 @@
-import os
 import csv
-from tempfile import mkstemp
+import threading
+from queue import Queue
 from image_downloader import Samples
+from paths import *
 
 files = ['./wshoes.csv','./mshoes.csv']
 badnames = ['shirts', 'Usb']
 sneakers = []
+shoes = []
+
+lock = threading.Lock()
+
+class Pick:
+  def __init__(self, sneakers):
+    super().__init__()
+    self.sneakers = set(sneakers)
+
+  def run(self):
+    Thread().run(self.sneakers)
 
 class Parser:
   def __init__(self):
-    super().__init__()
-
+    self.parse()
+    print('running')
   def parse(self):
     for file in files:
       with open(file) as w:
         cw = csv.DictReader(w, delimiter=",", quotechar='"')
-        c = 0
+        i = 0
         for row in cw:
           brand = row["brand"]
           name = row["name"]
@@ -37,17 +49,31 @@ class Parser:
             for name in badnames:
               if name not in fname:
                 sneakers.append(fname)
-    shoes = []
-    antiTraversal = ['../']
+    Pick(sneakers).run()
+
+class Thread:
+  def __init__(self):
+    super().__init__()
+    self.q = Queue()
+    self.m = 0
+
+  def do_work(self, shoe):
+    with HiddenPrints():
+      Samples(shoe).check()
+#    with lock:
+#      print(threading.current_thread().name)
+
+  def worker(self):
+    while True:
+      shoe = self.q.get()
+      self.do_work(shoe)
+      self.q.task_done()
+
+  def run(self, sneakers):
+    for i in range(2):
+      t = threading.Thread(target=self.worker)
+      t.daemon = True
+      t.start()
     for shoe in sneakers:
-      for traversal in antiTraversal:
-        if traversal not in shoe:
-          shoes.append(shoe)
-    for sneaker in set(shoes):
-      sneaker_model_names = sneaker.split('_')
-      sneaker_brand = sneaker_model_names[0]
-      sneaker_model = sneaker_model_names[1]
-
-      sample = Samples(sneaker_brand, sneaker_model)
-
-
+      self.q.put(shoe)
+    self.q.join()

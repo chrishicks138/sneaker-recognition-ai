@@ -1,5 +1,6 @@
+
 import tarfile
-import os, sys
+import sys
 from data_transform import *;
 from config import *;
 from trainer import *
@@ -8,47 +9,46 @@ from tempfile import mkstemp
 from progress import *
 
 class Archive:
-  def __init__(self):
+  def __init__(self, sneaker_brand, sneaker_model):
     super().__init__()
+    self.ArcDir = ArcDir(sneaker_brand, sneaker_model)
+    self.extract = ExtractDir(sneaker_brand, sneaker_model)
+    self.mdir = ModelDir(sneaker_brand, sneaker_model)
+    self.sneaker_brand = sneaker_brand
+    self.sneaker_model = sneaker_model
 
-  def archive_prep(self, sneaker_brand, sneaker_model, model_dir):
+  def archive_prep(self):
     files = []
-    self.files = files
-    self.model_dir = model_dir
-    for d in os.listdir(self.model_dir):
-      if 'tar.bz2' not in d:
-        if '.jpg' in d:
-          files.append(os.path.join(self.model_dir, d))
-    Archive().archive(sneaker_brand, sneaker_model, model_dir, files)
+    for d in self.mdir.__ls__():
+      if ARCHIVE_FORMAT not in d:
+        if IMAGE_FORMAT in d:
+          files.append(self.mdir.model_dir()+'/'+d)
+    Archive(self.sneaker_brand, self.sneaker_model).archive(files)
 
-  def archive(self, sneaker_brand, sneaker_model, model_dir, files):
-    arcdir = os.path.join(ARC_DIR, sneaker_brand)
-    if not os.path.exists(arcdir):
-      os.makedirs(arcdir)
-    tfile = arcdir+'/'+sneaker_model+'.tar.bz2'
+  def archive(self, files):
+    self.ArcDir.arc_dir()
 #    tfd, tfile = mkstemp()
-    with tarfile.open(tfile, "w:bz2") as tar:
-      c = 0
+    archive_file = self.ArcDir.archive_file()
+    self.bt = len(files)
+    c = 0
+    with tarfile.open(archive_file, "w|gz") as tar:
       for f in files:
-        c = 1+c
-        self.bt = len(files)
+        c = c+1
+        image = self.mdir.basename(f)
+        tar.add(f, arcname=image)
         self.m = c
         self.prestatus = 'Archiving'
         self.status = str(c)
         self.log_batch_index = c
         self.log_batch_size = len(files)
         Status().status(self.bt, self.prestatus, self.status, self.m, self.log_batch_index, self.log_batch_size)
-        image = os.path.basename(f)
-        tar.add(f, arcname=image)
-        os.remove(f)
-      tar.close()
+        self.mdir.__rmfile__(f)
 #    print(str(c)+' FILES ARCHIVED\n')
-    Trainer().run(tfile, sneaker_brand, sneaker_model)
     try:
-      for f in os.listdir(model_dir):
-        os.remove(model_dir+'/'+f)
-      os.rmdir(model_dir)
+      for f in self.mdir.model_dir():
+        self.mdir.__rmfile__(f)
+      self.mdir.__rmfile__(f)
     except:
-      print('\r'+model_dir+' NOT FOUND!')
+      print('\r'+self.mdir.model_dir()+' NOT FOUND!')
       return
 
