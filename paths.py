@@ -1,5 +1,6 @@
 import os, sys
 from config import *
+from db import *
 
 class HiddenPrints:
 
@@ -18,7 +19,6 @@ class HiddenPrints:
 
 class ExtractDir:
   def __init__(self, sneaker_brand, sneaker_model):
-    super().__init__()
     self.ipath = os.path.join(IMG_DIR, sneaker_brand, sneaker_model)
     self.tfile = os.path.join(ARC_DIR, sneaker_brand, sneaker_model+ARCHIVE_FORMAT)
 
@@ -48,7 +48,6 @@ class ExtractDir:
 
 class ModelDir:
   def __init__(self, sneaker_brand, sneaker_model):
-    super().__init__()
     self.sneaker_brand = sneaker_brand
     self.sneaker_model = sneaker_model
 
@@ -67,15 +66,14 @@ class ModelDir:
       os.remove(model_dir+'/'+file)
 
   def __rmfile__(self, file):
+    model_dir = os.path.join(ORIG_IMG_DIR, self.sneaker_brand, self.sneaker_model)
     try:
-      model_dir = os.path.join(ORIG_IMG_DIR, self.sneaker_brand, self.sneaker_model)
-      os.remove(model_dir+'/'+file)
+      os.remove(file)
     except:
-      return
+      raise
 
   def __rmdir__(self):
     os.rmdir(os.path.join(ORIG_IMG_DIR, self.sneaker_brand, self.sneaker_model))
-
   def model_dir(self):
     model_dir = os.path.join(ORIG_IMG_DIR, self.sneaker_brand, self.sneaker_model)
     if not os.path.exists(model_dir):
@@ -84,26 +82,25 @@ class ModelDir:
 
 class ArcDir:
   def __init__(self, sneaker_brand, sneaker_model):
-    super().__init__()
     self.sneaker_brand = sneaker_brand
     self.sneaker_model = sneaker_model
-    self.arcdir = os.path.join(ARC_DIR, sneaker_brand)
-    self.archive = os.path.join(self.arcdir, self.sneaker_model+ARCHIVE_FORMAT)
+    self.arcdir = ARC_DIR
 
   def archive_file(self):
-    return self.archive
+    archive = os.path.join(self.arcdir, self.sneaker_model+ARCHIVE_FORMAT)
+    return archive
 
   def __rm__(self):
-    os.remove(self.archive)
+    archive = os.path.join(self.arcdir, self.sneaker_model+ARCHIVE_FORMAT)
+    os.remove(archive)
 
-  def arc_dir(self):
-    if not os.path.exists(self.arcdir):
-      os.makedirs(self.arcdir+'/'+self.sneaker_model)
+  def __ls__(self):
+    archive_list = os.listdir(self.arcdir)
+    return archive_list
 
   def lsarc(self):
-    try: os.listdir(self.arcdir+'/'+self.sneaker_model)
-    except: os.makedirs(self.arcdir+'/'+self.sneaker_model)
-    if self.archive in os.listdir(self.arcdir+'/'+self.sneaker_model):
+    archive = os.path.join(self.arcdir, self.sneaker_model+ARCHIVE_FORMAT)
+    if archive in os.listdir(self.arcdir):
       return True
     else:
       return False

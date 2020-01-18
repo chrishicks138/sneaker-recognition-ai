@@ -3,6 +3,7 @@ import threading
 from queue import Queue
 from image_downloader import Samples
 from paths import *
+from db import *
 
 files = ['./wshoes.csv','./mshoes.csv']
 badnames = ['shirts', 'Usb']
@@ -15,6 +16,8 @@ class Pick:
   def __init__(self, sneakers):
     super().__init__()
     self.sneakers = set(sneakers)
+    for shoe in self.sneakers:
+      TOTAL.append(shoe)
 
   def run(self):
     Thread().run(self.sneakers)
@@ -49,6 +52,7 @@ class Parser:
             for name in badnames:
               if name not in fname:
                 sneakers.append(fname)
+
     Pick(sneakers).run()
 
 class Thread:

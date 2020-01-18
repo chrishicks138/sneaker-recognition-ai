@@ -1,10 +1,7 @@
-import sys
 from config import *;
 from PIL import Image
 from PIL import ImageFilter
 from PIL import ImageEnhance
-from progress import *
-from tempfile import mkstemp
 from archive import *
 
 class Convert:
@@ -36,10 +33,11 @@ class Convert:
 
   def convert(self):
     for file in self.files:
+      file = self.model_dir+'/'+file
       try:
-        with Image.open(self.model_dir+'/'+file) as im:
+        with Image.open(file) as im:
           im = im.resize((128,128), reducing_gap=2)
-          im.save(self.model_dir+'/'+file)
+          im.save(file)
           for mode in self.md:
             for theta in self.deg:
               self.m = 1+self.m
@@ -49,11 +47,8 @@ class Convert:
               im = im.save(image_path)
               im = Image.open(image_path)
               w,h = im.size
-              self.prestatus = w,h
-              self.status = str(self.m)+' files'
-              self.log_batch_index = self.m
-              Status().status(self.bt, self.prestatus, self.status, self.m, self.log_batch_index, self.log_batch_size)
-        self.mdir.__rmfile__(file)
       except:
         self.mdir.__rmfile__(file)
+        return
+      self.mdir.__rmfile__(file)
     Archive(self.sneaker_brand, self.sneaker_model).archive_prep()

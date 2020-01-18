@@ -1,1 +1,5 @@
 SHOES = []
+
+TOTAL = []
+
+ARCHIVES = []
