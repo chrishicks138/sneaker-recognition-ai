@@ -16,11 +16,12 @@ class Archive:
 
   def archive_prep(self):
     files = []
-    for d in self.mdir.__ls__():
-      if ARCHIVE_FORMAT not in d:
-        if IMAGE_FORMAT in d:
-          files.append(self.mdir.model_dir()+'/'+d)
-    Archive(self.sneaker_brand, self.sneaker_model).archive(files)
+    if len(self.mdir.__ls__()) != 0:
+      for d in self.mdir.__ls__():
+        if ARCHIVE_FORMAT not in d:
+          if IMAGE_FORMAT in d:
+            files.append(self.mdir.model_dir()+'/'+d)
+      Archive(self.sneaker_brand, self.sneaker_model).archive(files)
 
   def archive(self, files):
     archive_file = self.ArcDir.archive_file()
@@ -33,4 +34,3 @@ class Archive:
           self.mdir.__rmfile__(file)
         except:
           raise
-

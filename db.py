@@ -1,5 +1,15 @@
+DOWNLOADED = []
+
 SHOES = []
+
+BRANDS = []
 
 TOTAL = []
 
 ARCHIVES = []
+
+SAMPLES = []
+
+CONVERSION_ERRORS = []
+
+DOWNLOAD_ERRORS = []

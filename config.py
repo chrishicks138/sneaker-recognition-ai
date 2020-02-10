@@ -17,7 +17,5 @@ TEST_DIR = "./Data/Test";
 LIMIT = 10
 #Training passes
 PASS = 20
-#Image format
-IMAGE_FORMAT = 'jpg'
 #Archive format
 ARCHIVE_FORMAT = '.tar.gz'

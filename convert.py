@@ -21,34 +21,31 @@ class Convert:
       else:
         break
 
-
-  def img_mode(self, image_path, mode, im):
-    if "FLR" in mode:
-      im = im.transpose(method=Image.FLIP_LEFT_RIGHT)
-    if "BLR" in mode:
-      im = im.filter(ImageFilter.BLUR)
-    if "BW" in mode:
-      im = im.convert('L')
-    return im
-
   def convert(self):
     for file in self.files:
       file = self.model_dir+'/'+file
+      ext = file.split('.')[1]
       try:
         with Image.open(file) as im:
           im = im.resize((128,128), reducing_gap=2)
           im.save(file)
           for mode in self.md:
             for theta in self.deg:
-              self.m = 1+self.m
-              image_path = self.model_dir+'/'+"{0}_{1}_{2}_{3}_{4}.jpg".format(self.sneaker_brand, self.sneaker_model, self.m, theta, mode)
-              self.img_mode(image_path, mode, im)
+              image_path = self.model_dir+'/'+"{0}_{1}_{2}_{3}_{4}."+ext.format(self.sneaker_brand, self.sneaker_model, self.m, theta, mode)
+              if "FLR" in mode:
+                im = im.transpose(method=Image.FLIP_LEFT_RIGHT)
+              if "BLR" in mode:
+                im = im.filter(ImageFilter.BLUR)
+              if "BW" in mode:
+                im = im.convert('L')
               im = im.rotate(angle=theta)
-              im = im.save(image_path)
-              im = Image.open(image_path)
-              w,h = im.size
+              im.save(image_path)
       except:
         self.mdir.__rmfile__(file)
+        CONVERSION_ERRORS.append(file)
         return
-      self.mdir.__rmfile__(file)
+      try:
+        self.mdir.__rmfile__(file)
+      except:
+        raise
     Archive(self.sneaker_brand, self.sneaker_model).archive_prep()

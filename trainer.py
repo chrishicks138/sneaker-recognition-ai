@@ -94,8 +94,8 @@ class Trainer:
     return preds.argmax(dim=1).eq(labels).sum().item()
 
   def run(self):
-    for shoe in ARCHIVES:
-      shoe = shoe.split('.tar.gz')[0]
+    for sneaker in ARCHIVES:
+      shoe = sneaker.split('.tar.gz')[0]
       sneaker_model_names = shoe.split('_')
       sneaker_brand = sneaker_model_names[0]
       sneaker_model = sneaker_model_names[1]

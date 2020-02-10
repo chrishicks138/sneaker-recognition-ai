@@ -1,14 +1,25 @@
 from db import *
+from shoesql import Query
+
 
 class Stats:
   def shoes_processed(self):
     totals = len(SHOES)
-    return str(totals)+' shoes processed.\n'
+    return str(totals)
 
   def shoes_total(self):
     totals = len(TOTAL)
-    return str(totals)+' shoe brands.\n'
+    return str(totals)
 
   def archive_total(self):
     totals = len(ARCHIVES)
-    return str(totals)+' shoe brands converted.\n'
+    return str(totals)
+
+  def samples(self):
+    totals = len(SAMPLES)
+    return str(totals)
+
+  def conv_errors(self):
+    totals = len(CONVERSION_ERRORS)
+    return str(totals)
+

@@ -20,7 +20,7 @@ class HiddenPrints:
 class ExtractDir:
   def __init__(self, sneaker_brand, sneaker_model):
     self.ipath = os.path.join(IMG_DIR, sneaker_brand, sneaker_model)
-    self.tfile = os.path.join(ARC_DIR, sneaker_brand, sneaker_model+ARCHIVE_FORMAT)
+    self.tfile = os.path.join(ARC_DIR, sneaker_brand+'_'+sneaker_model+ARCHIVE_FORMAT)
 
   def __rm__(self):
     os.remove(self.tfile)
@@ -52,7 +52,7 @@ class ModelDir:
     self.sneaker_model = sneaker_model
 
   def __len__(self):
-    return len(os.path.join(ORIG_IMG_DIR, self.sneaker_brand, self.sneaker_model))
+    return len(os.listdir(os.path.join(ORIG_IMG_DIR, self.sneaker_brand, self.sneaker_model)))
 
   def __ls__(self):
     return os.listdir(os.path.join(ORIG_IMG_DIR, self.sneaker_brand, self.sneaker_model))
@@ -87,7 +87,8 @@ class ArcDir:
     self.arcdir = ARC_DIR
 
   def archive_file(self):
-    archive = os.path.join(self.arcdir, self.sneaker_model+ARCHIVE_FORMAT)
+    archive_file = self.sneaker_brand+'_'+self.sneaker_model+ARCHIVE_FORMAT
+    archive = os.path.join(self.arcdir, archive_file)
     return archive
 
   def __rm__(self):
@@ -96,6 +97,9 @@ class ArcDir:
 
   def __ls__(self):
     archive_list = os.listdir(self.arcdir)
+    ARCHIVES = []
+    for archive in archive_list:
+      ARCHIVES.append(archive)
     return archive_list
 
   def lsarc(self):
@@ -104,3 +108,11 @@ class ArcDir:
       return True
     else:
       return False
+
+class Database:
+
+  def remove(self):
+    try:
+      os.remove('./shoes.db')
+    except:
+      raise
