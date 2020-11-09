@@ -31,7 +31,8 @@ class Convert:
           im.save(file)
           for mode in self.md:
             for theta in self.deg:
-              image_path = self.model_dir+'/'+"{0}_{1}_{2}_{3}_{4}."+ext.format(self.sneaker_brand, self.sneaker_model, self.m, theta, mode)
+              image_path = self.model_dir+'/'+self.sneaker_brand+'_'+self.sneaker_model+'_'+self.m+'_'+theta+'_'+mode+'.'+ext
+              print(image_path)
               if "FLR" in mode:
                 im = im.transpose(method=Image.FLIP_LEFT_RIGHT)
               if "BLR" in mode:
@@ -39,6 +40,7 @@ class Convert:
               if "BW" in mode:
                 im = im.convert('L')
               im = im.rotate(angle=theta)
+              print("Success", mode, theta)
               im.save(image_path)
       except:
         self.mdir.__rmfile__(file)

@@ -1,5 +1,4 @@
 from db import *
-from shoesql import Query
 
 
 class Stats:

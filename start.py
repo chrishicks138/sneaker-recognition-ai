@@ -1,31 +1,37 @@
 from flask import Flask, render_template, g, request, redirect, url_for
 from flask_socketio import SocketIO
-from database_init import *
+#from database_init import *
 from status import *
 from trainer import *
-from shoesql import *
+#from shoesql import *
 import wtforms
+import sql
+import sqlConfig
+from image_downloader import Samples
 
+SHOES = []
+sql.main()
 app  = Flask(__name__)
 socketio = SocketIO(app, engineio_logger=True, async_mode="threading")
 
 class Forms(wtforms.Form):
-  search = wtforms.TextField('search')
   @app.route('/', methods=['GET', 'POST'])
   def hello():
-    args = '-1'
-    type = 'brand'
-    Forms().query(type,args)
+    Forms().query()
     downloads = str(len(DOWNLOADED))+' downloaded'
     form = Forms(request.form)
     brands = set(BRANDS)
     brandlen = str(len(brands))+' brands'
-    return render_template('index.html', form=form, downloads=downloads, brandlen=brandlen, brands=brands)
+    return render_template('index.html',
+                           form=form,
+                           downloads=downloads,
+                           brandlen=brandlen,
+                           brands=brands)
 
   def event(self,f):
     if f == 1:
-      socketio.emit('stat event', { 'data' : ' '+str(self.c+1)+'/'+str(len(SHOES))+' shoes '+self.archives+' archives '+self.cerrors+' errors, '})
-      socketio.emit('data event', { 'data' : ' Downloading '+self.brand+', '+str(len(SHOES))+' models'})
+      socketio.emit('stat_event', { 'data' : ' '+str(self.c+1)+'/'+str(len(SHOES))+' shoes '+self.archives+' archives '+self.cerrors+' errors, '})
+      socketio.emit('data_event', { 'data' : 'Downloading '+self.shoe[0]+self.shoe[1]})
     if f == 2:
       socketio.emit('data event', { 'data' : ' Stopping'})
     if f == 3:
@@ -48,13 +54,14 @@ class Forms(wtforms.Form):
     f = 1
     self.event(f)
 
-  def download(self,brand,stop):
+  def download(self,stop):
     shoes = enumerate(SHOES)
-    self.brand = brand
-    for self.c,shoe in shoes:
+    for self.c,self.shoe in shoes:
       self.stats()
-      shoe = brand+'_'+shoe
-      Download().do_work(shoe)
+      sneaker_brand = self.shoe[0]
+      sneaker_model = self.shoe[1]
+      Samples.download(sneaker_brand, sneaker_model)
+      '''
       if stop():
         f = 2
         self.event(f)
@@ -62,6 +69,7 @@ class Forms(wtforms.Form):
         f = 3
         self.event(f)
         break
+      '''
     f = 4
     self.event(f)
     return
@@ -70,28 +78,26 @@ class Forms(wtforms.Form):
     stop = False
     self.download(brand, lambda : stop)
 
-  def query(self,type,args):
-    for model in Query().query_db(type,args):
-      if (model['downloaded'] == 0):
-        if type == 'brand':
-          brand = model['brand']
-          BRANDS.append(brand)
-        if type == 'model':
-          shoe = model['model']
-          SHOES.append(shoe)
-      else:
-        if model not in DOWNLOADED:
-          DOWNLOADED.append(model)
 
-  @socketio.on('shoe event')
-  def handle_event(json, methods=['GET', 'POST']):
-    for item,brands in json.items():
-      print(item,brands)
-      for brand in brands:
-        args = '%'+brand+'%'
-        type = 'model'
-        Forms().query(type,args)
-        Forms().start(brand)
+  def query(self):
+      for item in sql.get_all(sqlConfig.DATABASE):
+        if (item[3] == 'False'):
+            brand = item[0]
+            BRANDS.append(brand)
+            shoe = item[1]
+            SHOES.append((brand, shoe))
+
+  @socketio.on('list_event')
+  def list_event(json, methods=['GET', 'POST']):
+      socketio.emit('list_response', { 'data' : len(sql.get_all(sqlConfig.DATABASE))})
+
+
+  #@socketio.on('shoe_event')
+  @socketio.on('start')
+  def handle_event(methods=['GET', 'POST']):
+      stop = False
+      Forms().download(stop)
+
 
   @socketio.on('stop event')
   def stop_event(methods=['GET', 'POST']):

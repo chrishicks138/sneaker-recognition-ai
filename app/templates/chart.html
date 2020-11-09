@@ -1,0 +1,133 @@
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"
+  />
+  <title>Chart.js Example</title>
+<!-- import plugin script -->
+  <script src="static/Chart.min.js"></script>
+  <link rel="stylesheet" href="static/style.css" >
+</head>
+<html>
+  <body>
+    <h1>Daily Budget Projection</h1>
+<!-- bar chart canvas element -->
+    <canvas id="myChart" width="1200" height="600"></canvas>
+    <p id="caption">This shows a {{ span_label }} day projection of expenses.</p>
+    <script>
+      // Global parameters: do not resize the chart canvas when its 
+      // container does (keep at 600x400px)
+      Chart.defaults.global.responsive = true;
+      // define the chart data
+      var chartData = {
+        labels : [{% for item in labels %} 
+                   "{{item}}",
+                  {% endfor %}],
+        datasets : [{
+          label: '{{ legend }}',
+          fill: true,
+          lineTension: 0,
+          backgroundColor: "rgba( 11, 98, 13 ,1)",
+          borderColor: "rgba(75,192,192,0.3)",
+          borderCapStyle: 'butt', 
+          borderDash: [],
+          borderDashOffset: 0.0,
+          borderJoinStyle: 'miter',
+          pointBorderColor: "rgba(75,192,192,0.3)", 
+          pointBackgroundColor: "#fff",
+          pointBorderWidth: 5, 
+          pointHoverRadius: 5,
+          pointHoverBackgroundColor: "rgba(75,192,192,1)",
+          pointHoverBorderColor: "rgba(220,220,220,1)",
+          pointHoverBorderWidth: 1, 
+          pointRadius: 1,
+          pointHitRadius: 10,
+          data :  [{% for item in values %}
+                     {{item}},
+                   {% endfor %}],
+          spanGaps: false 
+
+        }]
+      }
+      options: {
+        labels: {
+          fontColor: 'white'
+        }
+      }
+      // get chart canvas
+      var ctx = document.getElementById("myChart").getContext("2d");
+      // create the chart using the chart canvas
+      var myChart = new Chart(ctx, {
+        type: 'line',
+        data: chartData,
+      });
+    </script>
+    <div>
+      <div class="views">
+        <form method="post" action="" novalidate>
+          {{ span.span() }}
+          {{ span.submit() }}
+        </form>
+      </div>
+      <h2>Add Expense</h2>
+      <form method="post" action="" novalidate>
+              {{ expense_form.hidden_tag() }}
+	      <div>
+          {{ expense_form.expense.label }}<br>
+	          {{ expense_form.expense(size=32) }}
+	      </div>
+	      <div>
+          {{ expense_form.price.label }}<br>
+	        {{ expense_form.price(size=32) }}
+	      </div>
+	      <div>
+          {{ expense_form.occurence.label }}<br>
+	        {{ expense_form.occurence() }}
+	      </div>
+          {{ expense_form.expenseDate.label }}<br>
+	        {{ expense_form.expenseDate() }}
+	      {{ expense_form.submit() }}
+      </form>
+      <h2>Add Income</h2>
+      <form method="post" action="" novalidate>
+              {{ income_form.hidden_tag() }}
+	      <div>
+          {{ income_form.income.label }}<br>
+	        {{ income_form.income(size=32) }}
+	      </div>
+	      <div>
+          {{ income_form.price.label }}<br>
+	        {{ income_form.price(size=32) }}
+	      </div>
+	      <div>
+          {{ income_form.occurence.label }}<br>
+	        {{ income_form.occurence() }}
+	      </div>
+	      <div>
+          {{ income_form.payday.label }}<br>
+	        {{ income_form.payday() }}
+	      </div>
+	        {{ income_form.submit() }}
+      </form>
+    </div>
+    <div>
+      <h2>Expenses</h2>
+      {% for expense in expenses %}
+      <p>{{ expense.expense }} ${{ expense.price }}
+	<form method="post" action="/delete_expense" id="{{expense.id }}" novalidate>
+	  {{ deleteExpense.hidden(value=expense.id) }}
+	  {{ deleteExpense.submit() }}
+	</form></p>
+      {% endfor %}
+    </div>
+    <div>
+      <h2>Income</h2>
+      {% for income in incomes %}
+      <p>{{ income.income }} ${{ income.price }}
+	<form method="post" action="/delete_income" id="{{income.id }}" novalidate>
+	  {{ deleteIncome.hidden(value=income.id) }}
+	  {{ deleteIncome.submit() }}
+	</form></p>
+      {% endfor %}
+    </div>
+  </body>
+</html>
