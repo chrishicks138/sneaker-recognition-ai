@@ -87,12 +87,12 @@ class ArcDir:
     self.arcdir = ARC_DIR
 
   def archive_file(self):
-    archive_file = self.sneaker_brand+'_'+self.sneaker_model+ARCHIVE_FORMAT
+    archive_file = self.sneaker_brand+'_'+self.sneaker_model+'.'+ARCHIVE_FORMAT
     archive = os.path.join(self.arcdir, archive_file)
     return archive
 
   def __rm__(self):
-    archive = os.path.join(self.arcdir, self.sneaker_model+ARCHIVE_FORMAT)
+    archive = os.path.join(self.arcdir, self.sneaker_model+'.'+ARCHIVE_FORMAT)
     os.remove(archive)
 
   def __ls__(self):
@@ -103,7 +103,7 @@ class ArcDir:
     return archive_list
 
   def lsarc(self):
-    archive = os.path.join(self.arcdir, self.sneaker_model+ARCHIVE_FORMAT)
+    archive = os.path.join(self.arcdir, self.sneaker_model+'.'+ARCHIVE_FORMAT)
     if archive in os.listdir(self.arcdir):
       return True
     else:

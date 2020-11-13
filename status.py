@@ -22,3 +22,6 @@ class Stats:
     totals = len(CONVERSION_ERRORS)
     return str(totals)
 
+  def archive_errors(self):
+    totals = len(ARCHIVE_ERRORS)
+    return str(totals)

@@ -41,7 +41,7 @@ class Trainer:
 
       log_batch_size = 100;
       log_batch_index = 0;
-#      progress = ProgressBar(total=log_batch_size, prefix='Training', suffix='Now', decimals=3, length=50, fill='\u2588', zfill='-')
+      progress = ProgressBar(total=log_batch_size, prefix='Training', suffix='Now', decimals=3, length=50, fill='\u2588', zfill='-')
       for i, data in train_list:
         self.m = i
         self.prestatus = 'Training'
@@ -49,7 +49,7 @@ class Trainer:
         self.bt = len(self.data_set) / self.batch_size
         Status().status(self.bt, self.prestatus, self.status, self.m, log_batch_index, log_batch_size)
 
-#        progress.print_progress_bar(i - log_batch_index * log_batch_size + 1);
+        progress.print_progress_bar(i - log_batch_index * log_batch_size + 1);
         inputs, labels = data;
         if use_gpu:
           inputs = inputs.cuda();
@@ -94,7 +94,8 @@ class Trainer:
     return preds.argmax(dim=1).eq(labels).sum().item()
 
   def run(self):
-    for sneaker in ARCHIVES:
+    for sneaker in ArcDir().__ls__():
+      print(sneaker)
       shoe = sneaker.split('.tar.gz')[0]
       sneaker_model_names = shoe.split('_')
       sneaker_brand = sneaker_model_names[0]

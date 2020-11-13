@@ -14,6 +14,18 @@ CONVERSION_ERRORS = []
 
 DOWNLOAD_ERRORS = []
 
-ORIG_IMG_DIR = "./Data"
+ORIG_IMG_DIR = "Data"
+
+ARC_DIR = "Data/Archives"
+
+IMG_DIR = "Data/Images"
 
 LIMIT = 10
+
+ARCHIVE_FORMAT = ".tar.gz"
+
+ARCHIVE_ERRORS = []
+
+IMAGE_FORMAT = "png"
+
+DOWNLOADED = []
